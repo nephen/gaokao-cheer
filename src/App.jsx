@@ -100,7 +100,7 @@ export default function App() {
 
   // 倒计时
   useEffect(() => {
-    const target = new Date("2025-06-07T08:00:00");
+    const target = new Date("2025-06-07T09:00:00");
     const timer = setInterval(() => {
       const now = new Date();
       const diff = target - now;
