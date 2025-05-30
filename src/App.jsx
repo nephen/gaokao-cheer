@@ -55,11 +55,30 @@ const quotes = [
   "每一分努力都在为成功铺路！"
 ];
 
+const musicFiles = [
+  "https://nephen-blog.oss-cn-beijing.aliyuncs.com/post/bg-music1.mp3",
+  "https://nephen-blog.oss-cn-beijing.aliyuncs.com/post/bg-music2.mp3",
+  "https://nephen-blog.oss-cn-beijing.aliyuncs.com/post/bg-music3.mp3",
+  "https://nephen-blog.oss-cn-beijing.aliyuncs.com/post/bg-music4.mp3",
+  "https://nephen-blog.oss-cn-beijing.aliyuncs.com/post/bg-music5.mp3",
+  "https://nephen-blog.oss-cn-beijing.aliyuncs.com/post/bg-music6.mp3",
+  "https://nephen-blog.oss-cn-beijing.aliyuncs.com/post/bg-music7.mp3",
+  "https://nephen-blog.oss-cn-beijing.aliyuncs.com/post/bg-music8.mp3",
+  "https://nephen-blog.oss-cn-beijing.aliyuncs.com/post/bg-music9.mp3",
+  "https://nephen-blog.oss-cn-beijing.aliyuncs.com/post/bg-music10.mp3"
+];
+
 export default function App() {
-  const [quote, setQuote] = useState(quotes[0]);
+  const [quote, setQuote] = useState(() => {
+    const idx = Math.floor(Math.random() * quotes.length);
+    return quotes[idx];
+  });
   const [countdown, setCountdown] = useState({});
   const [isPlaying, setIsPlaying] = useState(false);
-  const [audio] = useState(new Audio("/bg-music.mp3"));
+  const [audio] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * musicFiles.length);
+    return new Audio(musicFiles[randomIndex]);
+  });
 
   // 🎯 许愿相关
   const [wishInput, setWishInput] = useState("");
@@ -93,6 +112,8 @@ export default function App() {
       audio.pause();
       setIsPlaying(false);
     } else {
+      const randomIndex = Math.floor(Math.random() * musicFiles.length);
+      audio.src = musicFiles[randomIndex];
       audio.play().then(() => setIsPlaying(true))
         .catch(() => console.log("需要用户交互才能播放音乐"));
     }
