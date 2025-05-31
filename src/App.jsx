@@ -79,10 +79,28 @@ export default function App() {
     const randomIndex = Math.floor(Math.random() * musicFiles.length);
     return new Audio(musicFiles[randomIndex]);
   });
+  const [visibleBatch, setVisibleBatch] = useState(0);
+  const [activeWishes, setActiveWishes] = useState([]);
+  const batchSize = 5; // 每批展示5条弹幕
 
   // 🎯 许愿相关
   const [wishInput, setWishInput] = useState("");
   const [wishes, setWishes] = useState([]);
+
+  useEffect(() => {
+    const totalBatches = Math.ceil(wishes.length / batchSize);
+    const timer = setInterval(() => {
+      setVisibleBatch(prev => (prev + 1) % totalBatches);
+    }, 10000); // 每10秒切换一批
+
+    return () => clearInterval(timer);
+  }, [wishes.length]);
+
+  useEffect(() => {
+    const startIdx = visibleBatch * batchSize;
+    const endIdx = startIdx + batchSize;
+    setActiveWishes(wishes.slice(startIdx, endIdx));
+  }, [visibleBatch, wishes]);
 
   useEffect(() => {
     const fetchWishes = async () => {
@@ -225,8 +243,8 @@ export default function App() {
         {quote}
       </motion.div>
 
-      <button 
-        onClick={newQuote} 
+      <button
+        onClick={newQuote}
         className="text-lg mb-8 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
         ✨ 换一句鼓励语
@@ -245,8 +263,8 @@ export default function App() {
           className="w-full p-3 rounded-lg text-indigo-900"
           whileFocus={{ scale: 1.05 }}
         />
-        <button 
-          type="submit" 
+        <button
+          type="submit"
           className="w-full text-lg bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
         >
           🎈 许愿！
@@ -254,7 +272,7 @@ export default function App() {
       </form>
 
       {/* 考前注意事项 */}
-      <motion.div 
+      <motion.div
         className="w-full max-w-md bg-white bg-opacity-20 p-4 rounded-lg mb-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -271,7 +289,7 @@ export default function App() {
       </motion.div>
 
       {/* 心理调节 */}
-      <motion.div 
+      <motion.div
         className="w-full max-w-md bg-white bg-opacity-20 p-4 rounded-lg mb-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -287,7 +305,7 @@ export default function App() {
       </motion.div>
 
       {/* 答题技巧 */}
-      <motion.div 
+      <motion.div
         className="w-full max-w-md bg-white bg-opacity-20 p-4 rounded-lg mb-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -303,39 +321,39 @@ export default function App() {
       </motion.div>
 
       <div className="w-full max-w-md space-y-2 max-h-80 overflow-y-auto">
-        {/* 弹幕形式的愿望列表 */}
         <div className="fixed inset-0 pointer-events-none z-20 overflow-hidden">
-        {wishes.map((wish, idx) => {
-          const top = `${10 + (idx % 10) * 8}%`; // 避免重叠，高度分布更合理
-          const duration = 15 + Math.random() * 10; // 更自然的时长
-          const offset = window.innerWidth + 400; // 保证完全滑出视图
+          {activeWishes.map((wish, idx) => {
+            const trackHeight = 100 / batchSize;
+            const top = `${idx * trackHeight}%`;
+            const duration = 10 + Math.random() * 5;
+            const offset = window.innerWidth + 400;
 
-          return (
-            <motion.div
-              key={idx}
-              className="absolute whitespace-nowrap text-lg font-semibold px-2 py-1 rounded-full"
-              style={{
-                color: wish.color,
-                top,
-                left: "100vw",
-                textShadow: "0 0 5px rgba(0,0,0,0.5)",
-                whiteSpace: "nowrap"
-              }}
-              initial={{ x: 0 }}
-              animate={{
-                x: -offset,
-                transition: {
-                  duration,
-                  repeat: Infinity,
-                  repeatType: "loop",
-                  ease: "linear"
-                }
-              }}
-            >
-              🎯 {wish.text}
-            </motion.div>
-          );
-        })}
+            return (
+              <motion.div
+                key={`${wish.text}-${idx}`}
+                className="absolute whitespace-nowrap text-lg font-semibold px-2 py-1 rounded-full"
+                style={{
+                  color: wish.color,
+                  top,
+                  left: "100vw",
+                  textShadow: "0 0 5px rgba(0,0,0,0.5)",
+                  whiteSpace: "nowrap"
+                }}
+                initial={{ x: 0 }}
+                animate={{
+                  x: -offset,
+                  transition: {
+                    duration,
+                    repeat: Infinity,
+                    repeatType: "loop",
+                    ease: "linear"
+                  }
+                }}
+              >
+                🎯 {wish.text}
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </div>
